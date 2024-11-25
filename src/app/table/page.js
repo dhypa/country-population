@@ -91,10 +91,6 @@ const CountryTable = ({ countries }) => {
             switch (sortBy) {
                 case 'population':
                     return b.population - a.population;
-                // case 'population-reverse':
-                //     if (a.population === "N/A") return 1;
-                //     if (b.population === "N/A") return -1;
-                //     return a.population - b.population;
                 case 'alphabetical':
                     return a.name.localeCompare(b.name);
                 case 'iso':
@@ -162,10 +158,6 @@ const CountryTable = ({ countries }) => {
                                                 src={country.flagUrl}
                                                 alt={`Flag of ${country.name}`}
                                                 className="object-contain w-6 h-4"
-                                                onError={(e) => {
-                                                    e.target.onerror = null;
-                                                    e.target.style.display = 'none';
-                                                }}
                                             />
                                         ) : (
                                             <Flag className="w-4 h-4 text-gray-400" />
