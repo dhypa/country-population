@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import React, { useState } from 'react';
+import { Search, SortAsc, Users } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { SortAsc, Users } from 'lucide-react';
 
 import FlagPlaceholder from '@/components/ui/placeholder';
+import { Input } from '@/components/ui/input';
 import PropTypes from 'prop-types';
 
 const formatPopulation = (population) => {
@@ -13,43 +14,72 @@ const formatPopulation = (population) => {
 
 
 const CountryCardGrid = ({ countries }) => {
-    const [sortBy, setSortBy] = useState('alphabetical');
+    const [sortBy, setSortBy] = useState("alphabetical");
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const sortedCountries = [...countries].sort((a, b) => {
-        switch (sortBy) {
-            case 'population':
-                // Handle "N/A" values
-                if (a.population === "N/A") return 1;
-                if (b.population === "N/A") return -1;
-                return b.population - a.population;
-            case 'alphabetical':
-                return a.name.localeCompare(b.name);
-            default:
-                return 0;
-        }
-    });
+    // Filter and sort countries
+    const filteredAndSortedCountries = [...countries]
+        .filter(country => {
+            const query = searchQuery.toLowerCase().trim();
+            return (
+                country.name.toLowerCase().includes(query) ||
+                country.iso.toLowerCase().includes(query)
+            );
+        })
+        .sort((a, b) => {
+            switch (sortBy) {
+                case 'population':
+                    if (a.population === "N/A") return 1;
+                    if (b.population === "N/A") return -1;
+                    return b.population - a.population;
+                case 'alphabetical':
+                    return a.name.localeCompare(b.name);
+                default:
+                    return 0;
+            }
+        });
     return (
         <div className="p-4">
-            <div className="flex items-center justify-between pr-16 mb-6">
-                <h1 className="text-2xl font-bold">Countries Overview</h1>
-                <div className="flex items-center gap-2">
-                    <SortAsc className="text-gray-500" size={20} />
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Sort by..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="alphabetical">Alphabetical</SelectItem>
-                            <SelectItem value="population">Population (High to Low)</SelectItem>
-                        </SelectContent>
-                    </Select>
+            <div className="space-y-4">
+
+                <div className="flex flex-col gap-4 sm:flex-row">
+                    {/* Search Input */}
+                    <div className="relative w-[84%]">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                        <Input
+                            placeholder="Search by country name or ISO code..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-8"
+                        />
+                    </div>
+
+                    {/* Sort Dropdown */}
+                    <div className="flex items-center gap-2">
+                        <SortAsc className="hidden text-gray-500 sm:block" size={20} />
+                        <Select value={sortBy} onValueChange={setSortBy}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Sort by..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="alphabetical">Alphabetical</SelectItem>
+                                <SelectItem value="population">Population (High to Low)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                {/* Results count */}
+                <div className="text-sm text-gray-500">
+                    Found {filteredAndSortedCountries.length} {filteredAndSortedCountries.length === 1 ? 'country' : 'countries'}
+                    {searchQuery && ` matching "${searchQuery}"`}
                 </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {sortedCountries.map((country) => (
+                {filteredAndSortedCountries.map((country) => (
                     <Card
                         key={country.iso}
-                        className="w-full max-w-sm transition-shadow hover:shadow-lg"
+                        className="w-full max-w-sm transition-shadow hover:bg-slate-200/30 hover:border hover:border-black"
                     >
                         <CardHeader className="p-4">
                             <div className="flex items-center justify-between gap-2">
@@ -68,10 +98,6 @@ const CountryCardGrid = ({ countries }) => {
                                         src={country.flagUrl}
                                         alt={`Flag of ${country.name}`}
                                         className="object-contain w-40 h-24"
-                                        onError={(e) => {
-                                            e.target.onerror = null; // Prevent infinite loop
-                                            e.target.parentElement.innerHTML = FlagPlaceholder({ countryName: country.name }).type({ countryName: country.name });
-                                        }}
                                     />
                                 ) : (
                                     <FlagPlaceholder countryName={country.name} />

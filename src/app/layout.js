@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import Link from "next/link";
 import React from "react";
 import localFont from "next/font/local";
 
@@ -26,8 +27,9 @@ export default function RootLayout({ children }) {
         <div className="p-4">
           <div className="flex flex-row items-center gap-1 py-3 justify-star">
             <h1 className="mr-6 text-2xl font-bold">Countries Statistics</h1>
-            <button className="p-3 text-base rounded-md hover:bg-slate-400/80"> Cards </button>
-            <button className="p-3 text-base rounded-md hover:bg-slate-400/80"> Table </button>
+            <Link href="/" className="p-3 text-base rounded-md hover:bg-slate-400/80"> Cards </Link>
+            <Link href="/table" className="p-3 text-base rounded-md hover:bg-slate-400/80"> Table </Link>
+            <Link href="/stats" className="p-3 text-base rounded-md hover:bg-slate-400/80"> Stats </Link>
           </div>
 
           {children}

@@ -27,7 +27,12 @@ const App = () => {
 
         const populationData = filterData(populationRes.data.data);
 
-        console.log(populationData);
+        if (populationRes.data.error === true || flagRes.data.error === true || capitalRes.data.error === true) {
+          console.error(populationRes.data.msg, flagRes.data.msg, capitalRes.data.msg);
+          throw new Error("Error fetching data");
+        }
+
+        // console.log(populationData);
 
         // Combine population and flag data
         const combinedData = populationData.map(country => {
@@ -35,7 +40,7 @@ const App = () => {
           const flag = flagRes.data.data.find(flag => flag.name === country.country);
           return {
             name: country.country,
-            population: country.populationCounts.slice(-1)[0]?.value || "N/A",
+            population: country.populationCounts.at(-1)?.value || "N/A",
             flagUrl: flag?.flag || "",
             capital: capital?.capital || "Unknown",
             iso: country.iso3 || "-",
