@@ -1,22 +1,19 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import React, { useEffect, useState } from "react";
+
+import CountryCardGrid from "./components/CountryCardGrid";
 import axios from "axios";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users } from "lucide-react";
-import FlagPlaceholder from "@/components/ui/placeholder";
 
 const filterData = (responseData) => {
   const startIndex = responseData.findIndex((item) => item.country === "Afghanistan");
   if (startIndex === -1) {
-    return []; // Return an empty array if "Afghanistan" is not found
+    return [];
   }
   return responseData.slice(startIndex); // Remove all elements before "Afghanistan"
 };
 
-const formatPopulation = (population) => {
-  if (population === "N/A") return "N/A";
-  return new Intl.NumberFormat('en-US').format(population);
-};
+
 
 const App = () => {
   const [countries, setCountries] = useState([]);
@@ -56,64 +53,9 @@ const App = () => {
 
 
   return (
-    <div className="p-4">
-      <h1 className="mb-6 text-2xl font-bold">Countries Overview</h1>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {countries.map((country) => (
-          <Card
-            key={country.iso}
-            className="w-full max-w-sm transition-shadow hover:shadow-lg"
-          >
-            <CardHeader className="p-4">
-              <div className="flex items-center justify-between gap-2">
-                <CardTitle className="text-lg font-bold truncate">
-                  {country.name}
-                </CardTitle>
-                <span className="flex-shrink-0 px-2 py-1 font-mono text-sm bg-gray-100 rounded">
-                  {country.iso}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-4">
-              <div className="flex items-center justify-center w-full h-32 overflow-hidden rounded bg-gray-50">
-                {country.flagUrl ? (
-                  <img
-                    src={country.flagUrl}
-                    alt={`Flag of ${country.name}`}
-                    className="object-contain w-40 h-24"
-                    onError={(e) => {
-                      e.target.onerror = null; // Prevent infinite loop
-                      e.target.parentElement.innerHTML = FlagPlaceholder({ countryName: country.name }).type({ countryName: country.name });
-                    }}
-                  />
-                ) : (
-                  <FlagPlaceholder countryName={country.name} />
-                )}
-              </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Capital:</span>
-                  <span className="font-medium text-sm truncate max-w-[160px]">
-                    {country.capital}
-                  </span>
-                </div>
+    <CountryCardGrid countries={countries} />
 
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1 text-sm text-gray-600">
-                    <Users size={14} />
-                    Population:
-                  </span>
-                  <span className="text-sm font-medium">
-                    {formatPopulation(country.population)}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
   );
 };
 
